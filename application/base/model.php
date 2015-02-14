@@ -7,7 +7,8 @@ use library\IRB_Paginator as pgn;
 
 class Model 
 {
-    protected static $_page_menu,
+    protected static $_cond,
+                     $_page_menu,
                      $_link_param = array();
 /** 
 * Статическая страница
@@ -68,11 +69,11 @@ class Model
     public static function getPagination($table, $id_parent, $num, $test = false)
     {
         pgn::setLimitParam($num, IRB_CONFIG_ROWS);
-        $where = !empty($id_parent) ? "WHERE `id_parent` = ".(int)$id_parent : '';
+        $where = !empty($id_parent) ? " `id_parent` = ".(int)$id_parent : '1';
      
         $res = pgn::countQuery("SELECT *
                                   FROM `". IRB_CONFIG_DBPREFIX . $table ."`
-                                    ". $where ."
+                                   WHERE ". $where . self::$_cond ."
                                       ORDER BY `id` DESC ",
                               $test);
       
@@ -93,6 +94,17 @@ class Model
     }
     
 /**
+* Постраничка: дополнительные условия.
+* @access public
+* @param string $cond
+* @return string 
+*/ 
+    public static function setPaginatorConditions($cond = '')
+    {
+        return self::$_cond = $cond;
+    } 
+    
+/**
 * Постраничка: генерация меню.
 * @access public
 * @return string 
@@ -101,7 +113,7 @@ class Model
     {
         return self::$_page_menu;
     } 
-    
+
 /** 
 * Добавляем запись
 * @access public

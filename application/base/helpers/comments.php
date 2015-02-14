@@ -24,9 +24,13 @@ class Comments
         if(true !== IRB_COMMENTS_JOIN)
         {
             self::$_table .= '_'. $owner;
+            $cond = '';
         }
+        else
+            $cond = "\nAND `owner` = '". db::escape($owner) ."'";
         
         Model::setPaginatorLink($link);
+        Model::setPaginatorConditions($cond);
         $result = Model::getPagination(self::$_table, $id_parent, $num);
         self::$_page_menu = Model::getPaginatorMenu();
         return $result; 
