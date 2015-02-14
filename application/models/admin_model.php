@@ -74,19 +74,19 @@ class Admin_Model extends Model
         $cond = "`id` IN (". implode(',', db::intval(self::$_id_cat)) .")";
         
         if(false === parent::deleteFrom('pages_category', $cond))
-            return getLanguage('FATAL_ERROR');
-
+            return self::_rollback();
+        
         if(!empty($id_pages))    
         {
             if(false === parent::deleteFrom('pages', $cond))
-                return getLanguage('FATAL_ERROR');
+                return self::_rollback();
             
             if(false === Comments::delete('page', $id_pages))
-                return getLanguage('FATAL_ERROR');
+                return self::_rollback();
         }
         
         if(false === Comments::delete('category', self::$_id_cat))
-            return getLanguage('FATAL_ERROR');
+            return self::_rollback();
      
         db::query('COMMIT');
         return false;   
@@ -160,7 +160,7 @@ class Admin_Model extends Model
         $cond = '`id` ='.(int)$id;
         
         if(false === parent::deleteFrom('pages', $cond))
-            return getLanguage('FATAL_ERROR');
+            return self::_rollback();
         
         db::query('COMMIT');
         return false;
@@ -196,6 +196,16 @@ class Admin_Model extends Model
         }
     } 
     
+/** 
+* Возврат транзакции
+* @access protected
+* @return string
+*/      
+    protected static function _rollback()
+    {
+        db::query('ROLLBACK');
+        return getLanguage('FATAL_ERROR');
+    }
 } 
 
     
