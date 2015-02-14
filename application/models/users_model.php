@@ -39,7 +39,7 @@ class Users_Model extends Model
                          );
         
         $result = db::prepareResult($res);
-        return $result[0];
+        return !empty($result[0]) ? $result[0] : create404();
     }
 
 /** 
