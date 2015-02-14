@@ -23,7 +23,7 @@ class Router
 /**     
 * Подхватываем контроллер (метод перегрузки)
 * @access public  
-* $param string $name, $arg
+* @param string $name, $arg
 * @return void   
 */    
     public static function __callStatic($name, $arg)

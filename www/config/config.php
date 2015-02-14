@@ -39,9 +39,7 @@
     define('IRB_CONFIG_DBSERVER',       'localhost');
     define('IRB_CONFIG_DBUSER',         'root');     
     define('IRB_CONFIG_DBPASSWORD',     '');
-    define('IRB_CONFIG_DATABASE',       'cms'); 
-    
-
+    define('IRB_CONFIG_DATABASE',       'cms');
    
     
     
