@@ -7,7 +7,7 @@
     define('IRB_CONFIG_DEBUG',        true);    
     define('IRB_CONFIG_EXCEPTION',    true);
 
-// Включает модуль перенаправления  
+// Включает ЧПУ (вид ссылок)  
     define('IRB_CONFIG_REWRITE',      true);
 
 // Дефолтный язык приложения   
