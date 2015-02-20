@@ -11,26 +11,29 @@ class Users_View extends View
 /**
 * Список юзеров 
 * @access public
-* @param int num
+* @param int $pag_num
 * @return void
 */       
-    public static function createUsersList($num)
+    public static function createUsersList($pag_num, $id_ans)
     {   
         $result = Users_Model::getUsersList();
         self::_createRows('users', htmlChars($result));
         self::$tpl->setBlock('list_users');
-        $link = array('users');
-        self::_createCommentsFor('users', $link, null, $num);
+        $link      = array('users');
+        $id_parent = null;
+        $data = compact('link', 'id_parent', 'pag_num', 'id_ans');
+        self::_createCommentsFor('users', $data);
         parent::_createTreeCategory();
     } 
     
 /**
 * Конкретный юзер
 * @access public
-* @param int id
+* @param int $pag_num
+* @param int $id_ans
 * @return void
 */       
-    public static function createUser($id, $num)
+    public static function createUser($id, $pag_num, $id_ans)
     {   
         $result = Users_Model::getUserData($id);
      
@@ -38,7 +41,9 @@ class Users_View extends View
         { 
             self::$tpl->assign($result);
             $link = array('users', 'user', $id);
-            parent::_createCommentsFor('user', $link, $id, $num);
+            $id_parent = $id;
+            $data = compact('link', 'id_parent', 'pag_num', 'id_ans');
+            parent::_createCommentsFor('user', $data);
         }
         else
             self::$tpl->setBlock('user_empty');

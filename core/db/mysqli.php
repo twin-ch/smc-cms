@@ -74,20 +74,7 @@ class Mysqli
         } 
         
         return $result; 
-    } 
-    
-/**
-* Запрос с разбором результата.
-* @access public
-* @param string $sql
-* @param bool $test
-* @return array 
-*/      
-    public static function queryAssoc($sql, $test = false)
-    {
-        $res = self::query($sql, $test);
-        return self::prepareResult($res);
-    } 
+    }
     
 /**
 * Разбор результата.
@@ -101,7 +88,7 @@ class Mysqli
      
         while($row = mysqli_fetch_assoc($res))
             $result[] = $row;
-         
+     
         return $result;    
     } 
     

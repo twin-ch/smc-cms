@@ -12,7 +12,7 @@
     <div id="header_inner" class="fixed">
       <div id="logo">
 <img src="http://pharm-forum.ru/smiles/21f9fce.gif" border="0" /><h1>SMC-CMS</h1><br />
- Super Mega Classy Content Management System 
+ Super Mega Cool Content Management System 
       </div>
       <div id="menu">
         <ul id="userMenu">
@@ -29,7 +29,7 @@
 <!--// content end -->
         <div id="secondaryContent_2columns">
             <div id="columnC_2columns">
-<?php include '/tree_category.tpl'; ?> 
+<?php include '/category/category.tpl'; ?> 
             </div>
         </div>
       <div class="clear"></div> 

@@ -20,7 +20,7 @@ class Enter_Controller
             $_SESSION['userdata']['id'] = 1;
             redirect('main');
         }
-        elseif($get['a'] == 'trusted')
+        elseif($get['a'] === 'trusted')
         {
             $_SESSION['userdata']['id'] = 2;
             redirect('main');

@@ -31,7 +31,7 @@
 
 <!--// add_page # Новая страница -->
     <h3><?php echo $category; ?></h3>
-    <a href="<?php echo href('main', 'category', iniGET('d')) ?>">Вернуться к списку</a>
+    <a href="<?php echo href('main', 'category', library\irb_url::iniGET('d')) ?>">Вернуться к списку</a>
     <!--// new_page -->
         <h4>Новая страница. Хотите создать?</h4>
     <!--// new_page end -->

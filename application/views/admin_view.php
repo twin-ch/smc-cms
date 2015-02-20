@@ -1,5 +1,10 @@
 <?php
 
+/**
+Временная админка, только побаловаться. 
+В ТЗ про админку не упоминали
+*/
+
 namespace views;
 
 use models\Admin_Model as Admin_Model;
@@ -25,13 +30,16 @@ class Admin_View extends View
 * Редактирование категории 
 * @access public
 * @param int $id_category
+* @param string $cat_name
 * @param string $sub_name
 * @return void
 */    
-    public static function createEditCategory($id_category, $sub_name)
+    public static function createEditCategory($id_category, $cat_name, $sub_name)
     {
-        $category = Admin_Model::getCategoryName($id_category);
-        self::$tpl->assign('cat_name', htmlChars($category));
+        if(empty($cat_name) || empty($sub_name))
+            $cat_name = Admin_Model::getCategoryName($id_category);
+        
+        self::$tpl->assign('cat_name', htmlChars($cat_name));
         self::$tpl->assign('sub_name', htmlChars($sub_name));
         self::$tpl->setBlock('edit_category');
         parent::_createTreeCategory();

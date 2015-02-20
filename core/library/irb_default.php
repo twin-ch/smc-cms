@@ -1,70 +1,7 @@
 <?php 
 
-/** 
-* Установка дефолтного GET. 
-* @access public 
-* @return array  
-*/   
-    function setArrayGET() 
-    { 
-        static $get; 
-     
-        if(empty($get)) 
-        { 
-            $keys   = range('a', 'z'); 
-            $values = array_fill(0, 26, ''); 
-            $get    = array_combine($keys, $values); 
-            $get    = array_merge(array('page' => 'main'), $get); 
-        } 
-     
-        return $get; 
-    }  
- 
-/**  
-* Разбор GET параметров.  
-* @access public  
-* @return array   
-*/  
-    function prepareGET()  
-    { 
-        $get = setArrayGET();  
-       
-        if(true === IRB_CONFIG_REWRITE && !empty($_GET['route']))   
-        {   
-            $param = explode('/', trim($_GET['route'], '/'));   
-            $i = 0;   
-         
-            foreach($get as $var => $val)  
-            {   
-                if(!empty($param[$i]))   
-                   $get[$var] = $param[$i];  
-                 
-                $i++;  
-            }  
-        }  
-        elseif(!empty($_GET))   
-        {   
-            foreach($get as $var => $val)   
-                if(!empty($_GET[$var]))   
-                   $get[$var] = $_GET[$var];       
-        }  
-     
-        return $get;  
-    }   
-    
-/**  
-* Инициализация GET.  
-* @access public  
-* @param string $key  
-* @param string $default  
-* @return string   
-*/        
-    function iniGET($key, $default = '')  
-    { 
-        $get = prepareGET();   
-        return (!empty($get[$key])) ? $get[$key] : $default;  
-    }
-    
+use library\IRB_URL as URL;
+
 /**
 * Инициализация POST.
 * @access public
@@ -77,39 +14,18 @@
         return (isset($_POST[$key]) && $_POST[$key] !== '') 
                ? $_POST[$key] : $default;
     }
-    
+
 /**
 * Формирование ссылок.
 * @access public
-* @param array $param
+* @param array $arg
 * @return string 
 */      
     function href()   
     { 
-        $arg  = func_get_args();
-        $get  = array_keys(setArrayGET());    
-        $host = IRB_HOST;
-        $href = '';   
-        $i    = 0;
-        
-        if(defined('IRB_ADMIN'))              
-            $host .= '/admin/'; 
-       
-        if(is_array($arg[0]))  
-            $arg = $arg[0];
-     
-        foreach($arg as $val)
-        {        
-            if(true === IRB_CONFIG_REWRITE)    
-              $href .= '/'. $val; 
-            elseif(!empty($val))   
-              $href .= '&'. $get[$i++] .'='. $val;  
-        }
-        
-        if(true === IRB_CONFIG_REWRITE)   
-            return $host . $href; 
-        else   
-            return $host .'?'. trim($href, '&');          
+        $arg = func_get_args();
+        $arg = is_array($arg[0]) ? $arg[0] : $arg;
+        return URL::createHref($arg);
     }
     
 /**   
@@ -122,7 +38,7 @@
 */ 
     function activeLink($param, $return, $default = false)
     {
-        $value = iniGET($param);
+        $value = URL::iniGET($param);
      
         if($default && $value === '')
             return 'class="active"';
@@ -130,40 +46,27 @@
         if(is_array($return) && in_array($value, $return))
             return 'class="active"';
         
-        return (iniGET($param) === $return) ? 'class="active"' : NULL;
+        return (URL::iniGET($param) === $return) ? 'class="active"' : NULL;
     }  
-    
     
 /**
 * Перенаправление
 * @access public
-* @param array $param
+* @param array $arg
 * @return void
 */     
     function reDirect()
     {    
-        $param = func_get_args();
+        $arg = func_get_args();
+        $arg = is_array($arg[0]) ? $arg[0] : $arg;
         
-        if(is_array($param[0]))
-           $param = array_shift($param);
-           
-        if(!empty($param))                          
-            header('location: '. href($param));
+        if(!empty($arg))                          
+            header('location: '. href($arg));
         else
             header('location: '. str_replace("/index.php", "", $_SERVER['HTTP_REFERER']));
         
         exit();
     }  
- 
-/**
- * Пути к картинкам
- * @param string $name
- * @param string $text
- */
-    function src($pic)
-    {
-        return '/skins/'. IRB_LANGUAGE .'/images/'. $pic;
-    }    
     
 /**
  * Сохраняет данные для передачи между страницами
@@ -198,18 +101,19 @@
 /**
 * Flash-редирект 
 * @access public
-* @return void|array|string
+* @param string $info
+* @param array $data
+* @param bool $default
+* @return void
 */
-    function redirectFlash()
+    function redirectFlash($param, $info = true)
     {
-        $args = func_get_args();
-        $info = array_shift($args);
-        
-        if(empty($info) || is_int($info))
-        {
+        if($info === false)
             setFlashData('info', getLanguage('CHANGE_DATA'));
-            redirect($args);
-        }
+        else
+            setFlashData('info', $info);
+        
+        redirect($param);
     }     
 
 /** 

@@ -3,13 +3,17 @@
 namespace base;
 
 use db\mysqli as db;
-use library\IRB_Paginator as pgn;
+use library\IRB_URL as URL;
+use base\helpers\IRB_Paginator as pgn;
+use base\helpers\Comments as Comments;
+use base\helpers\validator as Validator;
 
 class Model 
 {
     protected static $_cond,
                      $_page_menu,
-                     $_link_param = array();
+                     $_link_param = array(),
+                     $_order = " ASC ";
 /** 
 * Статическая страница
 * @access public
@@ -19,7 +23,7 @@ class Model
     public static function getStaticPage($page)
     {
         $page = preg_replace('~[^a-z0-9_]~', '', $page);
-        $path = IRB_ROOT .'/static/'. $page .'.txt';
+        $path = IRB_ROOT .'/contents/'. $page .'.txt';
      
         if(false === ($result = @file_get_contents($path)))
             trigger_error('No file with the content on: '. $path, E_USER_WARNING);
@@ -27,6 +31,35 @@ class Model
         return $result;
     }
 
+/** 
+* Добавляем комментарий 
+* @access public
+* @param string $owner
+* @param int $id_parent
+* @param string $author
+* @param string $comment
+* @param int $id_ans
+* @return void
+*/  
+    public static function addComment($owner, $id_parent, $author, $comment, $id_ans = 0)
+    {
+        if(false !== ($info = Validator::validationComment($author, $comment)))
+            return $info;
+        
+        $data = array('owner'      => $owner,
+                      'id_parent'  => $id_parent,
+                      'id_shift'   => $id_ans,
+                      'author'     => $author, 
+                      'text'       => $comment,
+                    );
+      
+        if(Comments::add($data))    
+            return getLanguage('FATAL_ERROR');
+        
+        $redirect = !empty($id_ans) ? URL::deleteParam(1, true) : URL::getParam();         
+        redirectFlash($redirect, getLanguage('ADD_COMMETNT'));
+    }  
+    
 /** 
 * Название категории
 * @access public
@@ -53,7 +86,7 @@ class Model
         $res = db::query("SELECT *
                             FROM `". IRB_CONFIG_DBPREFIX ."pages_category`"
                          );
-        
+     
         return db::prepareResult($res);
     } 
   
@@ -74,7 +107,7 @@ class Model
         $res = pgn::countQuery("SELECT *
                                   FROM `". IRB_CONFIG_DBPREFIX . $table ."`
                                    WHERE ". $where . self::$_cond ."
-                                      ORDER BY `id` DESC ",
+                                      ORDER BY `id`". self::$_order,
                               $test);
       
         self::$_page_menu = pgn::createMenu(self::$_link_param);
@@ -113,6 +146,16 @@ class Model
     {
         return self::$_page_menu;
     } 
+    
+/**
+* Постраничка: реверс.
+* @access public
+* @return string 
+*/ 
+    public static function getPaginatorDesc()
+    {
+        return self::$_order = " DESC ";
+    }
 
 /** 
 * Добавляем запись
@@ -168,13 +211,15 @@ class Model
         return !(bool)mysqli_insert_id(db::$link) ? getLanguage('FATAL_ERROR') : false;
     } 
 
+    
+    
 /**
 * Подготовка данных
 * @access protected
 * @param array $data
 * @return string 
 */        
-    public static function _prepareData($data)
+    protected static function _prepareData($data)
     { 
         $fields = array();
        

@@ -31,34 +31,7 @@
 
 
 <!--// comments_block # Комментарии -->
-    <br />
-    <br />
-    <br />
-    <br />
-    <h4>Комментарии</h4>
-    <div style="text-align:center"><?php echo $page_menu; ?></div>
-    
-    <!--// comments_rows --> 
-    <div class="comments">
-        <h5><?php echo $author; ?></h5>
-        <hr width="400px" align="left"/>
-            <?php echo $text; ?>
-    </div>
-    <!--// comments_rows end -->
-    
-    <!--// comments_empty -->
-        Нет комментариев
-    <!--// comments_empty end -->
-    
-    <div style="text-align:center"><?php echo $page_menu; ?></div>
-    <h4>Добавить комментарий</h4>
-    <form action="" method="post">
-    Имя<br />
-        <input name="author" type="text" value="<?php echo $author; ?>" /><br />
-    Текст<br />    
-        <textarea name="comment" cols="50" rows="10"><?php echo $comment; ?></textarea><br />
-        <input name="ok" type="submit" value="Отправить" />
-    </form>
+    <?php include '/comment/comment.tpl'; ?>
 <!--// comments_block end # Конец комментариев -->
 
             </div>

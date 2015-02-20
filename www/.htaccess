@@ -2,8 +2,6 @@ AddDefaultCharset UTF-8
 
 Options -Indexes
 
-ErrorDocument 404 /404.html
-
 php_flag magic_quotes_gpc Off 
 php_flag magic_quotes_runtime Off
 php_flag register_globals Off

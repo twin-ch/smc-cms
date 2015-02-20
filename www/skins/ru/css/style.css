@@ -61,8 +61,10 @@ p{line-height:1.8em;}
 #columnC_2columns a.active{color:#0000FF}
 #info {position:relative;color:red;border:1px dotted red;background:#FFD5F5;padding:10px;margin:10px}
 
-.comments {border:#958EA4 1px solid; margin:1px; padding:5px;background:#E8E8E8}
-
+.comment_css {margin:1px;padding:5px;background-color:#F0F4F3;border:1px dotted #7777BF;}
+.comment_main {position:relative;display:block;margin-bottom:10px; padding:5px;}
+.comment_main .delete{background: url('/skins/ru/images/delete.png') no-repeat; border:none; width:12px; height:12px}
+.comment_text {position:relative;display:block;font-size:13px;line-height:18px;color:#433;padding-top:12px;padding-right:12px}
 
 
 #footer{width:950px;margin:0 auto;text-align:center;clear:both;border-top:dotted 1px #E1E1E1;margin-top:1.0em;margin-bottom:1.0em;padding-top:1.0em;text-transform:lowercase;}

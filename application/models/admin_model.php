@@ -1,4 +1,8 @@
 <?php
+/**
+Временная админка, только побаловаться. 
+В ТЗ про админку не упоминали
+*/
 
 namespace models;
 
@@ -15,15 +19,15 @@ class Admin_Model extends Model
 * Новая категория
 * @access public
 * @param string $name
-* @param int $id_parent
+* @param int $id_shift
 * @return bool|int
 */      
-    public static function addCategory($name, $id_parent = 0)
+    public static function addCategory($name, $id_shift = 0)
     {
         $data = array('name' => $name);
         
-        if(!empty($id_parent))
-            $data['id_parent'] = $id_parent;
+        if(!empty($id_shift))
+            $data['id_shift'] = $id_shift;
             
         return parent::insertInto('pages_category', $data);
     } 
@@ -53,12 +57,12 @@ class Admin_Model extends Model
         
         db::query('START TRANSACTION');
      
-        $res = db::query("SELECT `id`, `id_parent`
+        $res = db::query("SELECT `id`, `id_shift`
                            FROM `". IRB_CONFIG_DBPREFIX ."pages_category`"
                            );
      
         while($row = mysqli_fetch_assoc($res))
-            $ids[$row['id']] = $row['id_parent'];
+            $ids[$row['id']] = $row['id_shift'];
         
         self::_setTreeCategory($ids, $id); 
         self::$_id_cat[] = $id;
@@ -165,6 +169,17 @@ class Admin_Model extends Model
         db::query('COMMIT');
         return false;
     } 
+
+/** 
+* Удаляем комментарий
+* @access public
+* @param int $id
+* @return bool|string
+*/      
+    public static function deleteComment($id)
+    {
+        return false;
+    }
     
 /** 
 * Рекурсивно достаем все подкатегории

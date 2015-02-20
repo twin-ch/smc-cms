@@ -3,7 +3,6 @@
 namespace models;
 
 use db\mysqli as db;
-use base\helpers\Comments as Comments;
 use base\model as Model;
 
 class Main_Model  extends Model
@@ -44,25 +43,7 @@ class Main_Model  extends Model
         return !empty($result[0]) ? $result[0] : create404();
     }  
    
-/** 
-* Добавляем комментарий 
-* @access public
-* @param string $owner
-* @param int $id_parent
-* @param string $author
-* @param string $comment
-* @return bool|string
-*/  
-    public static function addComment($owner, $id_parent, $author, $comment)
-    {
-        $data = array('owner'      => $owner,
-                      'id_parent'  => $id_parent,
-                      'author'     => $author, 
-                      'text'       => $comment,
-                    );
-      
-        return Comments::add($data);
-    }     
+   
 } 
 
     

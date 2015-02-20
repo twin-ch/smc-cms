@@ -2,9 +2,10 @@
 
 namespace base;
 
-use library\IRB_Template as IRB_Template;
+use library\IRB_Template as Template;
+use library\IRB_Tree as Tree;
+use library\IRB_URL as URL;
 use base\helpers\Look as look;
-use base\helpers\Tree as Tree;
 use base\helpers\Comments as Comments;
 use base\model as Model;
 
@@ -20,7 +21,7 @@ class View
 */
     public static function template($template)
     {
-        self::$tpl = new IRB_Template($template); 
+        self::$tpl = new Template($template); 
     }
     
 /**
@@ -67,17 +68,17 @@ class View
 * @return void
 */    
     protected static function _createTreeCategory()
-    {
+    {  
         if(look::checkRole('trusted'))
             self::$tpl->setBlock('category_add');
-     
+      
         $result = Model::getTreeCategory();
-       
+     
         if(!empty($result))
         {
-            $category = Tree::prepareCategory($result); 
+            $category = self::_createRowsTree('/category/category_row', 'category_css', $result);
             self::$tpl->assign('category', $category);
-            self::$tpl->setBlock('category_rows');             
+            self::$tpl->setBlock('category_rows');  
         }
         else
             self::$tpl->setBlock('category_empty');
@@ -91,32 +92,61 @@ class View
 * @param string $owner
 * @param array $link
 * @param int $id_parent
-* @param int $num
+* @param int $pag_num
+* @param string $key_ans
 * @return void
 */    
-    protected static function _createCommentsFor($owner, $link, $id_parent, $num)
-    {  
-        $result    = Comments::read($owner, $link, $id_parent, $num);
+    protected static function _createCommentsFor($owner, $data)
+    { 
+        $result    = Comments::readTree($owner, 
+                                        $data['link'], 
+                                        $data['id_parent'], 
+                                        $data['pag_num']
+                                        );
+     
         $page_menu = Comments::paginator();
-        self::$tpl->assign('page_menu', $page_menu);        
-        self::_createRows('comments', $result);
+        self::$tpl->assign('page_menu', $page_menu); 
+        
+        if(!empty($result))
+        {  
+            $comments = self::_createRowsTree('/comment/comment_row', 
+                                              'comment_css', 
+                                              $result,
+                                              $data['pag_num'],
+                                              $data['id_ans']
+                                              );
+            
+            self::$tpl->assign('comments', $comments);
+            self::$tpl->setBlock('comments_rows');  
+        }
+        else
+            self::$tpl->setBlock('comments_empty');
+        
+        if(!empty($data['id_ans']))
+        {
+            if(false !== ($collocutor = Comments::getCollocutor($data['id_ans'])))
+            {
+                self::$tpl->assign('collocutor', htmlChars($collocutor));
+                self::$tpl->setBlock('answer');
+            }
+        }
         
         $return_data = array('author'  => iniPOST('author'),
                              'comment' => iniPOST('comment')
                              );
+        
         self::$tpl->assign(htmlChars($return_data));
         self::$tpl->setBlock('comments_block');
     } 
 
 /**
-* Генерация рядов. 
+* Генерация простых рядов. 
 * @access protected
 * @param int $block
 * @param array $result
-* @param bool $admin
 * @return string 
 */ 
-    protected static function _createRows($block, $result, $admin = false)
+    protected static function _createRows($block, $result)
     {
         if(!empty($result))
         {
@@ -126,20 +156,61 @@ class View
             {
                 $row['num'] = ++$i;
                 self::$tpl->assign(htmlChars($row));
-                
-                if($admin)
-                    self::$tpl->setBlock('admin');
-                
                 self::$tpl->setBlock($block .'_rows');
-                
-                if($admin)
-                    self::$tpl->clearBlock('admin');
             }
         }
         else
             self::$tpl->setBlock($block .'_empty');
     }  
+    
+/**
+* Генерация рядов co вложенностью. 
+* @access protected
+* @param string $templ
+* @param string $css
+* @param array $result
+* @param array $pag_num
+* @param int $id_ans
+* @return string 
+*/ 
+    protected static function _createRowsTree($templ, $css, $result, $pag_num = '', $id_ans = '')
+    {
+        $i = 0;
+        $rows = array();
+        $tpl  = new Template($templ);
+     
+        foreach($result as $row)
+        { 
+            $count  = URL::countParam();
+            $sss    = empty($pag_num) ? 2 : 1;
+            $offset = empty($id_ans)  ? $count + $sss : $count;
+            $row['link1'] = URL::addParam(array($row['id']), $offset); 
+           
+            $tpl->assign(htmlChars($row));            
+         
+            $rows[$i]['rows']      = $tpl->parseTpl();
+            $rows[$i]['id']        = $row['id'];
+            $rows[$i]['id_shift']  = $row['id_shift'];
+            ++$i;  
+        }
+        
+        Tree::setting($css);
+        return Tree::prepare($rows); 
+    }     
+    
 }   
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

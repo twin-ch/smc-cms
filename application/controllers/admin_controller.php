@@ -1,4 +1,8 @@
 <?php
+/**
+Временная админка, только побаловаться. 
+В ТЗ про админку не упоминали
+*/
 
 namespace controllers;
 
@@ -26,7 +30,6 @@ class Admin_Controller
         $object = $get['b'];
         $method = $action . $object;
         self::$method($get);
-     
         Admin_View::createInfo(getFlashData('info'));
         Admin_View::run();
     }
@@ -45,9 +48,17 @@ class Admin_Controller
         if(!empty($_POST))
         { 
             if(false === ($info = Validator::validationCategory($cat_name)))
-                $info = $cid = Admin_Model::addCategory($cat_name);  
+            {
+                $info = $cid = Admin_Model::addCategory($cat_name);
+                
+                if(is_int($cid))
+                {
+                    $redirect = array('admin', 'edit', 'category', $cid); 
+                    redirectFlash($redirect, false);
+                }
+            }
             
-            redirectFlash($info, 'admin', 'edit', 'category', $cid);        
+            Admin_View::createInfo($info);
         }
         
         Admin_View::createAddCategory($cat_name);
@@ -78,10 +89,16 @@ class Admin_Controller
                     $info = $cid = Admin_Model::addCategory($sub_name, $cid); 
             }
             
-            redirectFlash($info, 'admin', 'edit', 'category', $cid); 
+            if(empty($info) || is_int($cid))
+            {
+                $redirect = array('admin', 'edit', 'category', $cid);
+                redirectFlash($redirect, false);
+            }
+            
+            Admin_View::createInfo($info);
         }
         
-        Admin_View::createEditCategory($cid, $cat_name);
+        Admin_View::createEditCategory($cid, $cat_name, $sub_name);
     }
     
 /**     
@@ -93,8 +110,14 @@ class Admin_Controller
     public static function deleteCategory($get)
     { 
         $cid  = $get['c'];
-        $info = Admin_Model::deleteCategory($cid);
-        redirectFlash($info, 'main');
+        
+        if(false === ($info = Admin_Model::deleteCategory($cid)))
+        {
+            $redirect = array('admin', 'add', 'category');
+            redirectFlash($redirect, false);
+        }
+        
+        Admin_View::createInfo($info);
     }
     
 /**     
@@ -114,7 +137,11 @@ class Admin_Controller
             if(false === ($info = Validator::validationPage($title, $text)))
                 $info = $pid = Admin_Model::addPage($cid, $title, $text);           
             
-            redirectFlash($info, 'admin', 'edit', 'page', $pid, $cid);
+            if(empty($info) || is_int($pid))
+            {
+                $redirect = array('admin', 'edit', 'page', $pid, $cid);    
+                redirectFlash($redirect, false);
+            }
         }
         
         Admin_View::createAddPage($cid); 
@@ -139,11 +166,31 @@ class Admin_Controller
             if(false === ($info = Validator::validationPage($title, $text)))
                 $info = Admin_Model::editPage($pid, $title, $text);
           
-            redirectFlash($info, 'admin', 'edit', 'page', $pid, $cid);    
+            if(empty($info) || is_int($pid))
+            {
+                $redirect = array('admin', 'edit', 'page', $pid, $cid);    
+                redirectFlash($redirect, false);
+            }
         }
      
         Admin_View::createEditPage($cid, $pid);    
     }    
+    
+/**     
+* Удаляем комментрий
+* @access public  
+* @param array $get
+* @return void   
+*/
+    public static function deleteComment($get)
+    {  
+        $id  = iniPOST('delete');
+        
+        if(false === ($info = Admin_Model::deleteComment(key($id))))
+            redirectFlash('', false);
+     
+        Admin_View::createInfo($info);
+    }  
     
 /**     
 * Удаляем страницу 
@@ -155,9 +202,13 @@ class Admin_Controller
     {  
         $pid  = $get['c'];
         $cid  = $get['d'];
-        $info = Admin_Model::deletePage($pid);
-        redirectFlash($info, 'main', 'category', $cid);
-    }   
+        
+        if(false === ($info = Admin_Model::deletePage($pid)))
+        {
+            $redirect = array('main', 'category', $cid);
+            redirectFlash($redirect, true);
+        }
+    }      
     
 /**     
 * 404 

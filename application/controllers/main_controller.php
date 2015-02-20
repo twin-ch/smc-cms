@@ -2,7 +2,6 @@
 
 namespace controllers;
 
-use base\helpers\validator as Validator;
 use models\Main_Model as Main_Model;
 use views\Main_View as Main_View;
 
@@ -34,10 +33,21 @@ class Main_Controller
 */
     public static function actionCategory($get)
     {
-        $cid = $get['b'];
-        $num = $get['c'];
-        self::_addComment('category', $cid);
-        Main_View::createListPages($cid, $num);
+        $cid     = $get['b'];
+        $pag_num = $get['c'];
+        $id_ans  = $get['d'];
+        $info    = '';
+        
+        if(!empty($_POST))
+        {
+            $author  = iniPOST('author');
+            $comment = iniPOST('comment');        
+          
+            $info = Main_Model::addComment('category', $cid, $author, $comment, $id_ans);
+        }
+        
+        Main_View::createInfo($info);
+        Main_View::createListPages($cid, $pag_num, $id_ans);
     } 
 
 /**     
@@ -48,11 +58,24 @@ class Main_Controller
 */
     public static function actionPage($get)
     {
-        $pid = $get['b'];
-        $cid = $get['c'];
-        $num = $get['d'];
-        self::_addComment('page', $pid);
-        Main_View::createPageContent($cid, $pid, $num);
+        $pid     = $get['b'];
+        $cid     = $get['c'];
+        $pag_num = $get['d'];
+        $id_ans  = $get['e'];
+        $info    = '';
+        
+        Main_View::createPageContent($cid, $pid, $pag_num, $id_ans);
+        
+        if(!empty($_POST))
+        {  
+            $author  = iniPOST('author');
+            $comment = iniPOST('comment');        
+          
+            $info = Main_Model::addComment('page', $pid, $author, $comment, $id_ans);
+        }
+        
+        Main_View::createInfo($info);
+        Main_View::createListPages($cid, $pag_num, $id_ans);
     }    
     
 /**     
@@ -63,28 +86,7 @@ class Main_Controller
     public static function __callStatic($name, $arg)
     {
         Main_View::createStaticPage('main');
-    }
-    
-/**     
-* Добавляем комментарии 
-* @access public 
-* @param string $owner
-* @param int $id
-* @return void   
-*/
-    protected static function _addComment($owner, $id)
-    {
-        if(!empty($_POST))
-        {
-            $author  = iniPOST('author');
-            $comment = iniPOST('comment');
-         
-            if(false === ($info = Validator::validationComment($author, $comment)))
-                $info = Main_Model::addComment($owner, $id, $author, $comment);
-            
-            redirectFlash($info);
-        }
-    }    
+    }   
     
 }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace library;
+namespace base\helpers;
 
 use db\mysqli as db;
 

@@ -13,10 +13,11 @@ class Main_View extends View
 * Список страниц категории 
 * @access public
 * @param int $id_category
-* @param int $num
+* @param int $pag_num
+* @param int $id_ans
 * @return void
 */    
-    public static function createListPages($id_category, $num)
+    public static function createListPages($id_category, $pag_num, $id_ans)
     {   
         $category = Main_Model::getCategoryName($id_category);
         self::$tpl->assign('category', htmlChars($category));
@@ -28,8 +29,10 @@ class Main_View extends View
      
         self::$tpl->setBlock('list_pages');
         
-        $link = array('main', 'category', $id_category);
-        parent::_createCommentsFor('category', $link, $id_category, $num);
+        $link      = array('main', 'category', $id_category);
+        $id_parent = $id_category;        
+        $data = compact('link', 'id_parent', 'pag_num', 'id_ans');
+        parent::_createCommentsFor('category', $data);
         parent::_createTreeCategory();
     }      
     
@@ -38,10 +41,11 @@ class Main_View extends View
 * @access public
 * @param int $id_category
 * @param int $id_page
-* @param int $num
+* @param int $pag_num
+* @param int $id_ans
 * @return void
 */    
-    public static function createPageContent($id_category, $id_page, $num)
+    public static function createPageContent($id_category, $id_page, $pag_num, $id_ans)
     { 
         $category = Main_Model::getCategoryName($id_category);
         self::$tpl->assign('category', htmlChars($category));
@@ -52,8 +56,10 @@ class Main_View extends View
         else
             self::$tpl->setBlock('page_empty');
             
-        $link = array('main', 'category', $id_category, 'page', $id_page);
-        parent::_createCommentsFor('page', $link, $id_page, $num);
+        $link      = array('main', 'category', $id_category, 'page', $id_page);
+        $id_parent = $id_category;        
+        $data = compact('link', 'id_parent', 'pag_num', 'id_ans');
+        parent::_createCommentsFor('page', $data);
         parent::_createTreeCategory();
     }
 }   
