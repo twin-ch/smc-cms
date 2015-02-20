@@ -1,18 +1,12 @@
-
-
---
--- База данных: `cms`
---
-
--- --------------------------------------------------------
-
 --
 -- Структура таблицы `irb_comments`
 --
 
 CREATE TABLE IF NOT EXISTS `irb_comments` (
   `id` int(5) NOT NULL AUTO_INCREMENT,
-  `id_parent` int(5) unsigned zerofill NOT NULL DEFAULT '00000',
+  `id_parent` int(5) NOT NULL DEFAULT '0',
+  `id_top` int(5) NOT NULL,
+  `id_shift` int(5) NOT NULL DEFAULT '0',
   `owner` enum('category','page','users','user') NOT NULL,
   `author` varchar(20) NOT NULL DEFAULT '',
   `text` text NOT NULL,
@@ -54,17 +48,17 @@ CREATE TABLE IF NOT EXISTS `irb_pages` (
 
 CREATE TABLE IF NOT EXISTS `irb_pages_category` (
   `id` int(5) NOT NULL AUTO_INCREMENT,
-  `id_parent` int(5) NOT NULL DEFAULT '0',
+  `id_shift` int(5) NOT NULL DEFAULT '0',
   `name` varchar(250) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
-  KEY `id_parent` (`id_parent`)
+  KEY `id_parent` (`id_shift`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
 
 --
 -- Дамп данных таблицы `irb_pages_category`
 --
 
-INSERT INTO `irb_pages_category` (`id`, `id_parent`, `name`) VALUES
+INSERT INTO `irb_pages_category` (`id`, `id_shift`, `name`) VALUES
 (1, 0, 'Категория 1'),
 (2, 1, 'Категория 1.1'),
 (3, 1, 'Категория 1.2'),
