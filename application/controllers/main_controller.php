@@ -63,9 +63,7 @@ class Main_Controller
         $pag_num = $get['d'];
         $id_ans  = $get['e'];
         $info    = '';
-        
-        Main_View::createPageContent($cid, $pid, $pag_num, $id_ans);
-        
+     
         if(!empty($_POST))
         {  
             $author  = iniPOST('author');
@@ -75,7 +73,7 @@ class Main_Controller
         }
         
         Main_View::createInfo($info);
-        Main_View::createListPages($cid, $pag_num, $id_ans);
+        Main_View::createPageContent($cid, $pid, $pag_num, $id_ans);
     }    
     
 /**     
