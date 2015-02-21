@@ -4,7 +4,7 @@ namespace base;
 
 use db\mysqli as db;
 use library\IRB_URL as URL;
-use base\helpers\IRB_Paginator as pgn;
+use base\helpers\Paginator as Pgn;
 use base\helpers\Comments as Comments;
 use base\helpers\validator as Validator;
 
@@ -101,16 +101,16 @@ class Model
 */  
     public static function getPagination($table, $id_parent, $num, $test = false)
     {
-        pgn::setLimitParam($num, IRB_CONFIG_ROWS);
+        Pgn::setLimitParam($num, IRB_CONFIG_ROWS);
         $where = !empty($id_parent) ? " `id_parent` = ".(int)$id_parent : '1';
      
-        $res = pgn::countQuery("SELECT *
+        $res = Pgn::countQuery("SELECT *
                                   FROM `". IRB_CONFIG_DBPREFIX . $table ."`
                                    WHERE ". $where . self::$_cond ."
                                       ORDER BY `id`". self::$_order,
                               $test);
       
-        self::$_page_menu = pgn::createMenu(self::$_link_param);
+        self::$_page_menu = Pgn::createMenu(self::$_link_param);
      
         return db::prepareResult($res); 
     }
@@ -152,7 +152,7 @@ class Model
 * @access public
 * @return string 
 */ 
-    public static function getPaginatorDesc()
+    public static function setPaginatorDesc()
     {
         return self::$_order = " DESC ";
     }

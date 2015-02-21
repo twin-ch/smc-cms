@@ -4,7 +4,7 @@ namespace base\helpers;
 
 use db\mysqli as db;
 
-class IRB_Paginator
+class Paginator
 {
 
     public static $table_count = 0;    
