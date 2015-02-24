@@ -9,7 +9,7 @@
     header("Content-Type: text/html; charset=utf-8"); 
     error_reporting(E_ALL & ~E_STRICT);      
     session_start();
-session_destroy();    
+    
     include __DIR__ .'/config/config.php';  
     include __DIR__ .'/config/system.php'; 
     
