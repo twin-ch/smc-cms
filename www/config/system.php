@@ -3,11 +3,21 @@
 ///////////////////////////////////////////////////////////////
 //                  СИСТЕМНЫЕ НАСТРОЙКИ   
 ///////////////////////////////////////////////////////////////
-
+/**
+* Выбор языка
+* @access public
+* @param string $lang
+* @return void 
+*/
+    function setLanguage($lang = IRB_CONFIG_LANGUAGE)
+    {
+        define('IRB_LANGUAGE',  $lang);
+    }  
 // Установка языка
     setLanguage();
+    
 // Системные константы
-    define('IRB_ROOT', $_SERVER['DOCUMENT_ROOT']);   
+    define('IRB_ROOT', dirname(__DIR__));   
     define('IRB_APPLICATION_ROOT', IRB_ROOT .'/'. IRB_CONFIG_APPLICATION);
     define('IRB_CORE_ROOT',        IRB_ROOT .'/'. IRB_CONFIG_CORE);
     define('IRB_DIR_TEMPLATE',     IRB_ROOT .'/skins/'. IRB_LANGUAGE . '/tpl');
@@ -20,20 +30,6 @@
 // Файл дефолтных функций    
     include IRB_CORE_ROOT .'/library/irb_default.php';
     
-    
-/////////////////////////////////////////////////////////////
-// Системные функции
-
-/**
-* Выбор языка
-* @access public
-* @param string $lang
-* @return void 
-*/
-    function setLanguage($lang = IRB_CONFIG_LANGUAGE)
-    {
-        define('IRB_LANGUAGE',  $lang);
-    }    
     
 /**
 * Автозагрузка классов
