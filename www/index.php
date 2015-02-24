@@ -7,10 +7,10 @@
 
 
     header("Content-Type: text/html; charset=utf-8"); 
-    error_reporting(E_ALL & ~E_STRICT);      
+    error_reporting(-1);      
     session_start();
     
-    include __DIR__ .'/config/config.php';  
+    include __DIR__ .'/config/main.php';  
     include __DIR__ .'/config/system.php'; 
     
     Router::run();   

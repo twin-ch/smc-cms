@@ -30,7 +30,6 @@
 // Файл дефолтных функций    
     include IRB_CORE_ROOT .'/library/irb_default.php';
     
-    
 /**
 * Автозагрузка классов
 * @access public
