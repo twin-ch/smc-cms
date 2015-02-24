@@ -1,10 +1,14 @@
 <?php
+namespace controllers;
+//exit('Упс... Админка на хостинге недоступна. <a href="'. $_SERVER['HTTP_REFERER'] .'">Вернуться</a>.');
+
+
 /**
 Временная админка, только побаловаться. 
 В ТЗ про админку не упоминали
 */
 
-namespace controllers;
+
 
 use base\helpers\Look as look;
 use base\helpers\Validator as Validator;
@@ -117,7 +121,7 @@ class Admin_Controller
             redirectFlash($redirect, false);
         }
         
-        Admin_View::createInfo($info);
+        redirectFlash('', false);
     }
     
 /**     
@@ -186,10 +190,8 @@ class Admin_Controller
     {  
         $id  = iniPOST('delete');
         
-        if(false === ($info = Admin_Model::deleteComment(key($id))))
+        if(false === Admin_Model::deleteComment(key($id)))
             redirectFlash('', false);
-     
-        Admin_View::createInfo($info);
     }  
     
 /**     
@@ -203,7 +205,7 @@ class Admin_Controller
         $pid  = $get['c'];
         $cid  = $get['d'];
         
-        if(false === ($info = Admin_Model::deletePage($pid)))
+        if(false === Admin_Model::deletePage($pid))
         {
             $redirect = array('main', 'category', $cid);
             redirectFlash($redirect, true);

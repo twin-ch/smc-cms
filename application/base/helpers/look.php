@@ -48,11 +48,17 @@ class Look
 */     
     protected static function _getUserDataById($id)
     {
-        $res = db::query("SELECT * FROM `". IRB_CONFIG_DBPREFIX ."users`
-                           WHERE `id` = ".(int)$id
-                        );
+        if(!empty($id))
+        {
+            $res = db::query("SELECT * FROM `". IRB_CONFIG_DBPREFIX ."users`
+                               WHERE `id` = ".(int)$id
+                            );
+            
+            $result = db::prepareResult($res);                            
+        }
         
-        return db::prepareResult($res);
+
+        return !empty($result) ? $result : false;
     }     
 }
 

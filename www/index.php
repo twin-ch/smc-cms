@@ -9,9 +9,9 @@
     header("Content-Type: text/html; charset=utf-8"); 
     error_reporting(E_ALL & ~E_STRICT);      
     session_start();
-    
-    include dirname(__FILE__) .'/config/config.php';  
-    include dirname(__FILE__) .'/config/system.php'; 
+session_destroy();    
+    include __DIR__ .'/config/config.php';  
+    include __DIR__ .'/config/system.php'; 
     
     Router::run();   
    
