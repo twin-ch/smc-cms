@@ -1,6 +1,6 @@
 <?php 
 
-use library\IRB_URL as URL;
+use library\IRB_URL as IRB_URL;
 
 /**
 * Инициализация POST.
@@ -25,7 +25,7 @@ use library\IRB_URL as URL;
     { 
         $arg = func_get_args();
         $arg = is_array($arg[0]) ? $arg[0] : $arg;
-        return URL::createHref($arg);
+        return IRB_URL::createHref($arg);
     }
     
 /**   
@@ -38,7 +38,7 @@ use library\IRB_URL as URL;
 */ 
     function activeLink($param, $return, $default = false)
     {
-        $value = URL::iniGET($param);
+        $value = IRB_URL::iniGET($param);
      
         if($default && $value === '')
             return 'class="active"';
@@ -46,7 +46,7 @@ use library\IRB_URL as URL;
         if(is_array($return) && in_array($value, $return))
             return 'class="active"';
         
-        return (URL::iniGET($param) === $return) ? 'class="active"' : NULL;
+        return (IRB_URL::iniGET($param) === $return) ? 'class="active"' : NULL;
     }  
     
 /**
@@ -174,9 +174,12 @@ use library\IRB_URL as URL;
 */ 
     function create404()
     {
-       header("HTTP/1.1 404 Not Found");     
-       include IRB_DIR_TEMPLATE .'/404.html';
-       exit();
+        if(true === IRB_CONFIG_DEBUG)
+            trigger_error('Not found', E_USER_ERROR); 
+       
+        header("HTTP/1.1 404 Not Found");     
+        include IRB_DIR_TEMPLATE .'/404.html';
+        exit();
     } 
 
 

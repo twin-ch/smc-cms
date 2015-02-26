@@ -37,7 +37,7 @@ class Main_Controller
         $pag_num = $get['c'];
         $id_ans  = $get['d'];
         $info    = '';
-        
+
         if(!empty($_POST))
         {
             $author  = iniPOST('author');

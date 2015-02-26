@@ -9,6 +9,8 @@
 
 .irb_dedugger .irb_level{color:red;background:#FECBCC;padding:5px}
 .irb_dedugger .irb_mess{color:black; background:#F5EDB1;padding:5px;}
+.irb_dedugger .irb_args_head{background:#F5EDB1;padding:15px 5px 5px 15px}
+.irb_dedugger .irb_args{padding:5px;border:1px solid #78ADFE;background:#E4FFFF}
 .irb_dedugger .irb_debug{border-collapse:collapse;}
 .irb_dedugger .irb_debug th{border:#8BA0A9 1px solid;background:#D8D8D8}
 .irb_dedugger .irb_debug td{border:#8BA0A9 1px solid;}
@@ -20,6 +22,7 @@
 .irb_dedugger .irb_code{float:left;padding:0px;font-size:15px;overflow-x:auto;width:96%;white-space: nowrap;}
 .irb_dedugger .irb_error_line{background:#FF2D2D;color:#FFFF00;width:100%;display:inline-block}
 .irb_dedugger .irb_trace_line{background:#FFFF00;color:#FF0000;width:100%;display:inline-block}
+
 
 .irb_dedugger .irb_tpl{color:#0000A8;}
 .irb_dedugger .irb_tpl_error{color:red; font-weight:bold}
@@ -42,6 +45,13 @@ function visible(id)
     return false;
 }
 
+function visibleDiv(id)
+{
+    var display = ge(id).style.display;
+    ge(id).style.display = (display == 'none') ? 'block' : 'none';
+    return false;
+}
+
 function visible_all(num)
 {
     var i = 1;
@@ -61,8 +71,8 @@ function visible_all(num)
 
     if(true === IRB_CONFIG_EXCEPTION)
     { 
+        set_exception_handler('setExceptionHandler');        
         set_error_handler('setAllException');
-        set_exception_handler('setExceptionHandler');
     }
 
     function setAllException($code, $message, $file, $line)
@@ -131,6 +141,7 @@ class AllException extends Exception
             default :
                 $level = 'CMS debugging mode: ';
         }
+        
 ?>
     <div class="irb_level" >
         <?php echo $level; ?>
@@ -146,7 +157,7 @@ class AllException extends Exception
             $cnt  = substr_count($mess, "\n") + 2;
             $nums = array_fill(1, $cnt, true);
 ?>
-            <div class="irb_mess">
+            <div class="irb_mess"><?php  ?>
                 <strong>Variable value</strong>  
                 <strong>in:</strong> <?php echo $trace[0]['file']; ?>
                 <strong>on line:</strong> <?php echo $trace[0]['line'];?>
@@ -185,7 +196,7 @@ class AllException extends Exception
                 <strong>on line:</strong> <?php echo $line;?>
             </div> 
             <div id="n_error">
-                <?php createPhpCode(array('file' => $file, 'line' => $line), true); ?>
+                <?php createPhpCode(array('file' => $file, 'line' => $line), $trace[0]['args'][4], true); ?>
             </div>            
                 <?php  createPhpTrace($code, $trace, $file, $line); ?>  
 <?php   } ?> 
@@ -218,9 +229,12 @@ class AllException extends Exception
         $i = 0;
         $spase = $revers = array_reverse($trace);
         array_unshift($spase, '');
-        
+     
         foreach($revers as $stack)
-        { 
+        {
+            if(empty($stack))
+                continue;
+         
             if($stack['function'] === 'setAllException' || $stack['function'] === 'trigger_error')
                 continue;
                 
@@ -233,7 +247,7 @@ class AllException extends Exception
                 <?php echo ++$i; ?>
             </td>
             <td>
-                <?php echo !empty($spase[$i-1]['class']) ? $spase[$i-1]['class'] : 'GLOBALS'; ?>
+                <?php echo !empty($spase[$i - 1]['class']) ? $spase[$i - 1]['class'] : 'GLOBALS'; ?>
             </td>
             <td>
             <a href="#" onclick="return visible('n_<?php echo $i; ?>')">
@@ -243,7 +257,8 @@ class AllException extends Exception
             <td>
                 <code>
                 <?php if(!empty($stack['class'])){ 
-                           echo ltrim(substr($stack['class'], strrpos($stack['class'], DIRECTORY_SEPARATOR)), '\\');?>::<?php
+                           echo ltrim(substr($stack['class'], strrpos($stack['class'], DIRECTORY_SEPARATOR)), '\\') . $stack['type']; ?>
+                           <?php
                       }                   
                       echo $stack['function'].'()'; ?>
                 </code>
@@ -254,7 +269,7 @@ class AllException extends Exception
         </tr>
         <tr class="irb_excerpt" style="display:none" id="n_<?php echo $i; ?>">
             <td colspan="5">
-                <?php createPhpCode($stack); ?>
+                <?php createPhpCode($stack, $spase[$i]['args']); ?>
             </td>
         </tr>    
 <?php  }  ?>     
@@ -272,8 +287,9 @@ class AllException extends Exception
 * @param bool $error
 * @return string
 */    
-    function createPhpCode($stack, $error = false)
-    {
+    function createPhpCode($stack, $args, $error = false)
+    { 
+        static $num_arg;
         $file = file($stack['file']);
         $line = array();
         $code = '';
@@ -294,24 +310,63 @@ class AllException extends Exception
                 $lines[] =  $i;
            
             $code .= $string;
-        }  
+        }    
 ?>
-    <div class="irb_listing">
-        <div class="irb_num">
-            <code><?php 
-                $lines = array_slice($lines, $position, 20);
-                echo  implode("<br>", $lines); 
-            ?></code>
+        <div class="irb_args_head">
+            <a href="#" onclick=" return visibleDiv('arg_<?php echo ++$num_arg; ?>')"><?php 
+            echo $error ? 'The current variable table' : 'Arguments'; ?></a>
         </div>
-        <div class="irb_code">
-            <code><?php echo  highlightString($code, $position); ?></code>
+        <div class="irb_args"  style="display:none" id="arg_<?php echo $num_arg; ?>">
+            <code><pre><?php 
+                ob_start();
+                var_dump($args);
+                $args = ob_get_clean();
+                echo highlightDump($args); 
+            ?></pre></code>
+        </div>   
+        <div class="irb_listing">
+            <div class="irb_num">
+                <code><?php 
+                    $lines = array_slice($lines, $position, 20);
+                    echo  implode("<br>", $lines); 
+                ?></code>
+            </div>
+            <div class="irb_code">
+                <code><?php echo  highlightString($code, $position); ?></code> 
+            </div>
+            <div class="clear"></div>
         </div>
-        <div class="clear"></div>
-    </div>
 <?php
-
     }
 
+/**
+* Подсветка var_dump
+* @param string $code
+* @return string
+*/    
+    function highlightDump($code)
+    {
+?>
+<style type="text/css">
+.irb_dedugger .type{font-weight:bold;font-style:italic;color:#009500}
+</style>
+<?php
+        preg_match_all('~"(.*?)"[\]\n]~is', $code, $out);
+        //$code = preg_replace();
+//var_dump($out);
+        $strings = array('empty'  => '<span class="empty">empty</span>',
+                         'array'  => '<span class="type">array</span>',
+                         'object' => '<span class="type">object</span>',
+                         'string' => '<span class="type">string</span>',
+                         'int'    => '<span class="type">string</span>',
+                         
+        );
+    
+        $code = str_replace(array_keys($strings), array_values($strings), $code);
+        //$code = preg_replace('~()~uis', '', $code);
+        return $code;
+    }    
+    
 /**
 * Подсветка php кода
 * @param string $code
@@ -376,7 +431,7 @@ class AllException extends Exception
 * @param bool $error
 * @return void
 */ 
-    function dbg($variable = '') 
+    function dbg($variable = '', $test = true) 
     {
         $trace =  debug_backtrace();
         
@@ -393,10 +448,7 @@ class AllException extends Exception
         else
             $value = 'Empty';
      
-        if(true === IRB_CONFIG_EXCEPTION) 
-            throw new \Exception($value, 27);
-        else
-            trigger_error($value, E_USER_ERROR);
+        throw new \Exception($value, 27);
     }  
 
 

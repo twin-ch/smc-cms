@@ -1,6 +1,6 @@
 <?php
 
-use library\IRB_URL as URL;
+use library\IRB_URL as IRB_URL;
 
 class Router
 {
@@ -13,14 +13,14 @@ class Router
 
     public static function run()
     { 
-        URL::setRewrite(IRB_CONFIG_REWRITE);
-        URL::setHost(IRB_HOST);
+        IRB_URL::setRewrite(IRB_CONFIG_REWRITE);
+        IRB_URL::setHost(IRB_HOST);
         
-        $page = URL::iniGET('page', 'empty');
-        $name = preg_replace('~[^a-z0-9_]~', '', $page);
+        $routes = IRB_URL::iniGET('page', 'empty');
+        $routes = preg_replace('~[^a-z0-9_]~', '', $routes); 
      
-        if(__METHOD__ !== __CLASS__ .'::'. $name)
-            self::$name(URL::prepareGET());
+        if(__METHOD__ !== __CLASS__ .'::'. $routes)
+            self::$routes(IRB_URL::prepareGET());
         else
             create404();
     }

@@ -5,6 +5,13 @@ namespace library;
 class IRB_URL
 {
 
+/**
+* Диапазон ключей GET параметров 
+* @var $range_get
+* @access public
+*/  
+    public static $range_get = array('a', 'g');
+
     protected static $_host,
                      $_get,    
                      $_mode = true;
@@ -52,7 +59,7 @@ class IRB_URL
     { 
         if(empty(self::$_get))
             self::$_get = self::prepareGET();
-            
+      
         return count(self::_clearLast(self::$_get)); 
     } 
 
@@ -165,6 +172,10 @@ class IRB_URL
        
         $get  = array_keys(self::_createDefault()); 
         $keys = array_slice($get, $offset - 1, count($param), true);
+        
+        //var_dump($keys);
+        //var_dump($param);
+        
         $arr  = array_merge(self::$_get, array_combine($keys, $param));        
         $arr  = self::_clearLast($arr);
         return ($type) ? $arr : self::_createURL($arr);
@@ -227,8 +238,8 @@ class IRB_URL
      
         if(empty($get)) 
         { 
-            $keys   = range('a', 'z'); 
-            $values = array_fill(0, 26, 0); 
+            $keys   = range(self::$range_get[0], self::$range_get[1]); 
+            $values = array_fill(0, count($keys), 0); 
             $get    = array_combine($keys, $values); 
             $get    = array_merge(array('page' => 'main'), $get); 
         } 

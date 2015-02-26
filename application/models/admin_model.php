@@ -178,7 +178,7 @@ class Admin_Model extends Model
 */      
     public static function deleteComment($id)
     {
-        return true; // Ждет реализации
+        trigger_error('Ждет реализации', E_USER_ERROR); 
     }
     
 /** 

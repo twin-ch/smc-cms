@@ -2,9 +2,9 @@
 
 namespace base;
 
-use library\IRB_Template as Template;
-use library\IRB_Tree as Tree;
-use library\IRB_URL as URL;
+use library\IRB_Template as IRB_Template;
+use library\IRB_Tree as IRB_Tree;
+use library\IRB_URL as IRB_URL;
 use base\helpers\Look as look;
 use base\helpers\Comments as Comments;
 use base\model as Model;
@@ -21,7 +21,7 @@ class View
 */
     public static function template($template)
     {
-        self::$tpl = new Template($template); 
+        self::$tpl = new IRB_Template($template); 
     }
     
 /**
@@ -173,18 +173,18 @@ class View
 * @param int $id_ans
 * @return string 
 */ 
-    protected static function _createRowsTree($templ, $css, $result, $pag_num = '', $id_ans = '')
+    protected static function _createRowsTree($templ, $css, $result, $pag_num = 0, $id_ans = '')
     {
         $i = 0;
-        $rows = array();
-        $tpl  = new Template($templ);
-     
+        $rows   = array();
+        $tpl    = new IRB_Template($templ);
+        $count  = IRB_URL::countParam();
+        $sss    = empty($pag_num) ? 2 : 1;
+        $offset = empty($id_ans)  ? $count + $sss : $count;
+      
         foreach($result as $row)
         { 
-            $count  = URL::countParam();
-            $sss    = empty($pag_num) ? 2 : 1;
-            $offset = empty($id_ans)  ? $count + $sss : $count;
-            $row['link1'] = URL::addParam(array($row['id']), $offset); 
+            $row['link1'] = IRB_URL::addParam(array($row['id']), $offset); 
            
             $tpl->assign(htmlChars($row));            
          
@@ -194,8 +194,8 @@ class View
             ++$i;  
         }
         
-        Tree::setting($css);
-        return Tree::prepare($rows); 
+        IRB_Tree::setting($css);
+        return IRB_Tree::prepare($rows); 
     }     
     
 }   

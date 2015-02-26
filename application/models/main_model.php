@@ -20,7 +20,7 @@ class Main_Model  extends Model
                               FROM `". IRB_CONFIG_DBPREFIX ."pages`
                                 WHERE `id_parent` = ".(int)$id_parent ."
                                   ORDER BY `id` " 
-                        );
+                       );
      
         return db::prepareResult($res);
     }

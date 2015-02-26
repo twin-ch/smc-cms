@@ -20,7 +20,7 @@
     define('IRB_CONFIG_CORE',         '../core');
     
 // Количество строк в постраничке
-    define('IRB_CONFIG_ROWS',          2);
+    define('IRB_CONFIG_ROWS',          10);
     
 // Хранение комментариев в общей таблице
     define('IRB_COMMENTS_JOIN',        true);

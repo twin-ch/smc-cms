@@ -34,9 +34,9 @@ class Users_View extends View
 * @return void
 */       
     public static function createUser($id, $pag_num, $id_ans)
-    {   
+    {    
         $result = Users_Model::getUserData($id);
-     
+       
         if(!empty($result))
         { 
             self::$tpl->assign($result);
