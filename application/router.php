@@ -16,7 +16,7 @@ class Router
         IRB_URL::setRewrite(IRB_CONFIG_REWRITE);
         IRB_URL::setHost(IRB_HOST);
         
-        $routes = IRB_URL::iniGET('page', 'empty');
+        $routes = IRB_URL::iniGET('page');
         $routes = preg_replace('~[^a-z0-9_]~', '', $routes); 
      
         if(__METHOD__ !== __CLASS__ .'::'. $routes)
