@@ -69,11 +69,11 @@ function visible_all(num)
 <?php
 }
 
-    //if(true === IRB_CONFIG_EXCEPTION)
-    //{ 
+    if(true === IRB_CONFIG_EXCEPTION)
+    { 
         set_exception_handler('setExceptionHandler');        
         set_error_handler('setAllException');
-    //}
+    }
 
     function setAllException($code, $message, $file, $line)
     {
