@@ -2,7 +2,7 @@
 
 namespace models;
 
-use db\mysqli as db;
+use db\db as db;
 use base\model as Model;
 
 class Main_Model  extends Model
@@ -22,7 +22,7 @@ class Main_Model  extends Model
                                   ORDER BY `id` " 
                        );
      
-        return db::prepareResult($res);
+        return db::fetchArray($res);
     }
     
 /**
@@ -39,8 +39,8 @@ class Main_Model  extends Model
                                   ORDER BY `id` "
                          );
         
-        $result = db::prepareResult($res);
-        return !empty($result[0]) ? $result[0] : create404();
+        $result = db::fetchRow($res);
+        return !empty($result) ? $result : create404();
     }  
    
    

@@ -50,6 +50,7 @@ class IRB_URL
         $get = self::prepareGET();   
         return (!empty($get[$key])) ? $get[$key] : $default;  
     } 
+    
 /**  
 * Подсчет активных параметров.  
 * @access public    
@@ -57,28 +58,10 @@ class IRB_URL
 */        
     public static function countParam()  
     { 
-        if(empty(self::$_get))
-            self::$_get = self::prepareGET();
+        self::$_get = self::_getArray();
       
         return count(self::_clearLast(self::$_get)); 
-    } 
-
-/**  
-* Достаем GET параметр по номеру.  
-* @access public 
-* @param string $offset
-* @return string   
-*/        
-    public static function getValueByNum($offset = 0)  
-    { 
-        if(empty(self::$_get))
-            self::$_get = self::prepareGET();
-            
-        $keys = array_keys(self::$_get);
-        return self::$_get[$keys[$offset]]; 
-    }     
-
-
+    }    
 
 /**  
 * Разбор GET параметров.  
@@ -141,6 +124,35 @@ class IRB_URL
     }   
     
 /**
+* Установка параметра.
+* @access public
+* @param string $param
+* @param string $value
+* @return array 
+*/      
+    public static function addParam($param, $value)   
+    {
+        self::$_get = self::_getArray();
+        self::$_get[$param] = $value;
+        return self::_clearLast(self::$_get);
+    }
+    
+/**
+* Синглетончик.
+* @access public
+* @param string $param
+* @param string $value
+* @return void 
+*/      
+    protected static function _getArray()   
+    {
+        if(empty(self::$_get))
+            self::$get = self::prepareGET();
+       
+        return self::$_get;    
+    } 
+    
+/**
 * Удаляем последние парамеры.
 * @access public
 * @param int $offset 
@@ -154,32 +166,9 @@ class IRB_URL
        
         $act = self::_clearLast(self::$_get);
         $arr = !empty($offset) ? array_slice($act, 0, -$offset, true) : $act;
+        $arr = self::_clearLast($arr); 
         return ($type) ? $arr : self::_createURL($arr);
-    }
-
-/**
-* Добавляем парамеры к текущему URL.
-* @access public
-* @param array $param
-* @param int $offset
-* @param bool $type
-* @return string 
-*/      
-    public static function addParam($param, $offset = 0, $type = false)   
-    {
-        if(empty(self::$_get))
-            self::$_get = self::prepareGET();
-       
-        $get  = array_keys(self::_createDefault()); 
-        $keys = array_slice($get, $offset - 1, count($param), true);
-        
-        //var_dump($keys);
-        //var_dump($param);
-        
-        $arr  = array_merge(self::$_get, array_combine($keys, $param));        
-        $arr  = self::_clearLast($arr);
-        return ($type) ? $arr : self::_createURL($arr);
-    }
+    } 
     
 /**
 * Формирование URL.

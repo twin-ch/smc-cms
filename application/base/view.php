@@ -76,7 +76,7 @@ class View
      
         if(!empty($result))
         {
-            $category = self::_createRowsTree('/category/category_row', 'category_css', $result);
+            $category = self::_createRowsTree('category', $result);
             self::$tpl->assign('category', $category);
             self::$tpl->setBlock('category_rows');  
         }
@@ -109,8 +109,7 @@ class View
         
         if(!empty($result))
         {  
-            $comments = self::_createRowsTree('/comment/comment_row', 
-                                              'comment_css', 
+            $comments = self::_createRowsTree('comments', 
                                               $result,
                                               $data['pag_num'],
                                               $data['id_ans']
@@ -166,26 +165,26 @@ class View
 /**
 * Генерация рядов co вложенностью. 
 * @access protected
-* @param string $templ
-* @param string $css
+* @param string $mod
 * @param array $result
 * @param array $pag_num
 * @param int $id_ans
 * @return string 
 */ 
-    protected static function _createRowsTree($templ, $css, $result, $pag_num = 0, $id_ans = '')
+    protected static function _createRowsTree($mod, $result, $pag_num = 0, $id_ans = '')
     {
         $i = 0;
         $rows   = array();
-        $tpl    = new IRB_Template($templ);
-        $count  = IRB_URL::countParam();
-        $sss    = empty($pag_num) ? 2 : 1;
-        $offset = empty($id_ans)  ? $count + $sss : $count;
-      
+        $config = \Config::get($mod);        
+        $tpl    = new IRB_Template($config['template']);
+        
+        if(!empty($pag_num))
+            IRB_URL::addParam($config['key_pag'], $pag_num);
+        
         foreach($result as $row)
-        { 
-            $row['link1'] = IRB_URL::addParam(array($row['id']), $offset); 
-           
+        {  
+            $arg = IRB_URL::addParam('e', $row['id']);
+            $row['link_ans'] = href($arg);
             $tpl->assign(htmlChars($row));            
          
             $rows[$i]['rows']      = $tpl->parseTpl();
@@ -194,7 +193,7 @@ class View
             ++$i;  
         }
         
-        IRB_Tree::setting($css);
+        IRB_Tree::setting($config['css_class']);
         return IRB_Tree::prepare($rows); 
     }     
     

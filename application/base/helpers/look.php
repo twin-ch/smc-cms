@@ -2,7 +2,7 @@
 
 namespace base\helpers;
 
-use db\mysqli as db;
+use db\db as db;
 
 class Look
 {
@@ -34,8 +34,8 @@ class Look
     {    
         self::$_userdata = self::getUserData(@$_SESSION['userdata']['id']);
         
-        if(!empty(self::$_userdata[0]))
-            return (bool)($access === self::$_userdata[0]['role']);
+        if(!empty(self::$_userdata))
+            return (bool)($access === self::$_userdata['role']);
         else
             return false;
     }
@@ -54,7 +54,7 @@ class Look
                                WHERE `id` = ".(int)$id
                             );
             
-            $result = db::prepareResult($res);                            
+            $result = db::fetchRow($res);                            
         }
         
 

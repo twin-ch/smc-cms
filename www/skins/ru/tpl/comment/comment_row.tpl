@@ -9,6 +9,6 @@
             <hr width="400px" align="left"/>
                 <?php echo $text; ?>
                  
-                <div style="text-align:right"> <a href="<?php echo $link1 .'#answer'; ?>">Ответить</a></div>
+                <div style="text-align:right"> <a href="<?php echo $link_ans .'#answer'; ?>">Ответить</a></div>
         </div>
   

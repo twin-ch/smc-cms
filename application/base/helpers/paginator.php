@@ -1,12 +1,11 @@
 <?php
-
 namespace base\helpers;
 
-use db\mysqli as db;
+use db\db as db;
+use library\IRB_URL as IRB_URL;
 
 class Paginator
 {
-
     public static $table_count = 0;    
     public static $table_total = 0;
     public static $start_page  = 0;
@@ -14,7 +13,7 @@ class Paginator
     protected static $_num_page    = 1, 
                      $_num_rows    = 1,   
                      $_num_columns = 1,
-                     $_link_param  = array();
+                     $_param       = 'a';
 /**
 * Constructor
 * @param int $page
@@ -69,8 +68,8 @@ class Paginator
                            FROM ". $table[1]
                            );
         
-        $data = db::prepareResult($res);
-        self::$table_count = $data[0]['cnt']; 
+        $data = db::fetchRow($res);
+        self::$table_count = $data['cnt']; 
         $res = db::query($query . self::_createLimit(), $debug);
        
         return $res;
@@ -92,23 +91,22 @@ class Paginator
                           $debug);
      
         $result = db::query('SELECT FOUND_ROWS()');
-        $data   = db::prepareResult($result);
+        $data   = db::fetchRow($result);
        
-        self::$table_count = $data[0]['FOUND_ROWS()']; 
+        self::$table_count = $data['FOUND_ROWS()']; 
         self::_createLimit();
      
         return $res;
     }
-
 /**
 * Generates the navigation menu
 * @access public
 * @param string $param
 * @return string
 */    
-    public static function createMenu()
+    public static function createMenu($param = 'a')
     { 
-        self::$_link_param = func_get_args();
+        self::$_param = $param;
         
        
         $count = ceil(self::$table_total / self::$_num_rows / self::$_num_columns);
@@ -214,7 +212,6 @@ class Paginator
         return ' LIMIT '. self::$start_page .', '. self::$_num_rows * self::$_num_columns;
      
     }
-
 /**
 * Makes a hyperlink
 * @param int $page
@@ -230,24 +227,11 @@ class Paginator
            
         if($active)
         {   
-            $arg   = self::$_link_param[0];
-            array_push($arg, $page);
+            $arg = IRB_URL::addParam(self::$_param, $page);
             return "<span class=\"IRB_paginator". $class ."\">\n"
                  . "<a href=\"". href($arg) ."\" >". $link ."</a>\n</span>\n";
         }
         else
             return "<span class=\"IRB_paginator". $class ."\"> ". $link ." </span>\n";
     }
-
 }
-
-
-
-
-
-
-
-
-
-
-

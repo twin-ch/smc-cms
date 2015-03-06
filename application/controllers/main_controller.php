@@ -34,8 +34,8 @@ class Main_Controller
     public static function actionCategory($get)
     {
         $cid     = $get['b'];
-        $pag_num = $get['c'];
-        $id_ans  = $get['d'];
+        $pag_num = $get['d'];
+        $id_ans  = $get['e'];
         $info    = '';
 
         if(!empty($_POST))
@@ -58,8 +58,8 @@ class Main_Controller
 */
     public static function actionPage($get)
     {
-        $pid     = $get['b'];
-        $cid     = $get['c'];
+        $cid     = $get['b'];
+        $pid     = $get['c'];
         $pag_num = $get['d'];
         $id_ans  = $get['e'];
         $info    = '';

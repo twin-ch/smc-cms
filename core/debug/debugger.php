@@ -69,11 +69,11 @@ function visible_all(num)
 <?php
 }
 
-    if(true === IRB_CONFIG_EXCEPTION)
-    { 
+    //if(true === IRB_CONFIG_EXCEPTION)
+    //{ 
         set_exception_handler('setExceptionHandler');        
         set_error_handler('setAllException');
-    }
+    //}
 
     function setAllException($code, $message, $file, $line)
     {
@@ -196,7 +196,7 @@ class AllException extends Exception
                 <strong>on line:</strong> <?php echo $line;?>
             </div> 
             <div id="n_error">
-                <?php createPhpCode(array('file' => $file, 'line' => $line), $trace[0]['args'][4], true); ?>
+                <?php createPhpCode(array('file' => $file, 'line' => $line), $trace[0]['args'], true); ?>
             </div>            
                 <?php  createPhpTrace($code, $trace, $file, $line); ?>  
 <?php   } ?> 

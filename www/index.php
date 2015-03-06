@@ -23,7 +23,7 @@
     echo '<br /><br /><br />';
     echo 'Время генерации страницы: '. sprintf("%01.4f", microtime(true) - $start) .'<br />';
     echo 'Количество подключенных файлов: '. count(get_included_files()) .'<br />';
-    echo 'Количество запросов: '. db\mysqli::$count .'<br />';
+    echo 'Количество запросов: '. db\db::$count .'<br />';
 
    
 dbg(get_included_files());

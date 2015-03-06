@@ -2,9 +2,9 @@
 
 namespace base;
 
-use db\mysqli as db;
+use db\db as db;
 use library\IRB_URL as URL;
-use base\helpers\Paginator as Pgn;
+
 use base\helpers\Comments as Comments;
 use base\helpers\validator as Validator;
 
@@ -72,8 +72,8 @@ class Model
                               FROM `". IRB_CONFIG_DBPREFIX ."pages_category`
                                 WHERE `id` = ".(int)$id
                         );
-        $result = db::prepareResult($res);
-        return !empty($result[0]) ? $result[0]['name'] : create404();
+        $result = db::fetchRow($res);
+        return !empty($result) ? $result['name'] : create404();
     }
     
 /** 
@@ -87,75 +87,8 @@ class Model
                             FROM `". IRB_CONFIG_DBPREFIX ."pages_category`"
                          );
      
-        return db::prepareResult($res);
+        return db::fetchArray($res);
     } 
-  
-/** 
-* Запрос с постраничкой
-* @access public
-* @param string $table
-* @param int $id_parent
-* @param int $num
-* @param bool $test
-* @return bool|array
-*/  
-    public static function getPagination($table, $id_parent, $num, $test = false)
-    {
-        Pgn::setLimitParam($num, IRB_CONFIG_ROWS);
-        $where = !empty($id_parent) ? " `id_parent` = ".(int)$id_parent : '1';
-     
-        $res = Pgn::countQuery("SELECT *
-                                  FROM `". IRB_CONFIG_DBPREFIX . $table ."`
-                                   WHERE ". $where . self::$_cond ."
-                                      ORDER BY `id`". self::$_order,
-                              $test);
-      
-        self::$_page_menu = Pgn::createMenu(self::$_link_param);
-     
-        return db::prepareResult($res); 
-    }
-    
-/**
-* Постраничка: установка параметров ссылки.
-* @access public
-* @param array $param
-* @return array 
-*/      
-    public static function setPaginatorLink($param = array())
-    {
-        return self::$_link_param = $param;
-    }
-    
-/**
-* Постраничка: дополнительные условия.
-* @access public
-* @param string $cond
-* @return string 
-*/ 
-    public static function setPaginatorConditions($cond = '')
-    {
-        return self::$_cond = $cond;
-    } 
-    
-/**
-* Постраничка: генерация меню.
-* @access public
-* @return string 
-*/ 
-    public static function getPaginatorMenu()
-    {
-        return self::$_page_menu;
-    } 
-    
-/**
-* Постраничка: реверс.
-* @access public
-* @return string 
-*/ 
-    public static function setPaginatorDesc()
-    {
-        return self::$_order = " DESC ";
-    }
 
 /** 
 * Добавляем запись
@@ -171,7 +104,7 @@ class Model
                             SET ". self::_prepareData($data), 
                         $test);
         
-        $id = mysqli_insert_id(db::$link);
+        $id = db::insertId();
         return empty($id) ? getLanguage('FATAL_ERROR') : $id;
     }
     
@@ -191,7 +124,7 @@ class Model
                             WHERE `id` = ".(int)$id, 
                         $test);
      
-        return !(bool)mysqli_affected_rows(db::$link) ? getLanguage('FATAL_ERROR') : false;
+        return !(bool)db::affectedRows() ? getLanguage('FATAL_ERROR') : false;
     }
     
 /** 
@@ -208,7 +141,7 @@ class Model
                             WHERE ". $cond,
                         $test);
      
-        return !(bool)mysqli_insert_id(db::$link) ? getLanguage('FATAL_ERROR') : false;
+        return !(bool)db::insertId() ? getLanguage('FATAL_ERROR') : false;
     } 
 
     

@@ -6,7 +6,7 @@
 
 namespace models;
 
-use db\mysqli as db;
+use db\db as db;
 use base\helpers\Comments as Comments;
 use base\Model as Model;
 
@@ -61,7 +61,9 @@ class Admin_Model extends Model
                            FROM `". IRB_CONFIG_DBPREFIX ."pages_category`"
                            );
      
-        while($row = mysqli_fetch_assoc($res))
+        $result = db::fetchArray($res);
+        
+        foreach($result as $row)
             $ids[$row['id']] = $row['id_shift'];
         
         self::_setTreeCategory($ids, $id); 
@@ -69,13 +71,15 @@ class Admin_Model extends Model
         
         $res = db::query("SELECT `id` 
                            FROM `". IRB_CONFIG_DBPREFIX ."pages`
-                           WHERE `id_parent` IN (". implode(',', db::intval(self::$_id_cat)) .")"
+                           WHERE `id_parent` IN (". db::implodeInt(self::$_id_cat) .")"
                            );
      
-        while($row = mysqli_fetch_assoc($res))
+        $result = db::fetchArray($res);
+        
+        foreach($result as $row)
             $id_pages[] = $row['id']; 
      
-        $cond = "`id` IN (". implode(',', db::intval(self::$_id_cat)) .")";
+        $cond = "`id` IN (". db::implodeInt(self::$_id_cat) .")";
         
         if(false === parent::deleteFrom('pages_category', $cond))
             return self::_rollback();
@@ -109,7 +113,7 @@ class Admin_Model extends Model
                                 WHERE `id` = ".(int)$id
                         );
         
-        $result = db::prepareResult($res);
+        $result = db::fetchRow($res);
         return !empty($result[0]) ? $result[0] : create404();
     }   
     

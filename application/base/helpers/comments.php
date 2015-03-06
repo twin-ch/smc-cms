@@ -2,12 +2,14 @@
 
 namespace base\helpers;
 
-use db\mysqli as db;
+use db\db as db;
 use base\Model as Model;
+use base\helpers\Paginator as Paginator;
 
 class Comments
 {
     protected static $_table       = 'comments';
+    protected static $_mod         = 'comments';
     protected static $_table_users = 'users';
     protected static $_page_menu;
 
@@ -17,10 +19,10 @@ class Comments
 * @param string $owner
 * @param array $link
 * @param int $id_parent
-* @param int $num
+* @param int $pag_num
 * @return bool|array
 */  
-    public static function readTape($owner, $link, $id_parent, $num)
+    public static function readTape($owner, $link, $id_parent, $pag_num)
     {    
         if(true !== IRB_COMMENTS_JOIN)
         {
@@ -30,11 +32,9 @@ class Comments
         else
             $cond = "\nAND `owner` = '". db::escape($owner);
      
-        Model::setPaginatorLink($link);
-        Model::setPaginatorConditions($cond);
-        $result = Model::getPagination(self::$_table, $id_parent, $num);
-        self::$_page_menu = Model::getPaginatorMenu();
-        return $result;
+        $where = !empty($id_parent) ? " `id_parent` = ".(int)$id_parent : '1';
+        
+        return self::_getPagination($where, $cond, $pag_num);
     }
     
 /** 
@@ -43,10 +43,10 @@ class Comments
 * @param string $owner
 * @param array $link
 * @param int $id_parent
-* @param int $num
+* @param int $pag_num
 * @return bool|array
 */  
-    public static function readTree($owner, $link, $id_parent, $num)
+    public static function readTree($owner, $link, $id_parent, $pag_num)
     {
         if(true !== IRB_COMMENTS_JOIN)
         {
@@ -55,11 +55,10 @@ class Comments
         }
         else
             $cond = "\nAND `owner` = '". db::escape($owner) ."'\nAND `id_top` = 0";
+         
+        $where = !empty($id_parent) ? " `id_parent` = ".(int)$id_parent : '1';
         
-        Model::setPaginatorLink($link);
-        Model::setPaginatorConditions($cond);
-        $result = Model::getPagination(self::$_table, $id_parent, $num);
-        self::$_page_menu = Model::getPaginatorMenu();
+        $result = self::_getPagination($where, $cond, $pag_num);
         
         foreach($result as $row)
             $ids[] = (int)$row['id'];
@@ -73,7 +72,7 @@ class Comments
                                 OR `id_top`   IN (". implode(',', $ids) ."))"
                              );
         
-        return  db::prepareResult($res);
+        return  db::fetchArray($res);
     }
     
 /**
@@ -99,8 +98,8 @@ class Comments
                             FROM `". IRB_CONFIG_DBPREFIX . self::$_table ."`
                             WHERE `id` = ".(int)$id 
                            );
-        $row = db::prepareResult($res); 
-        return empty($row) ? false : $row[0]['author'];
+        $row = db::fetchRow($res); 
+        return empty($row) ? false : $row['author'];
     }
     
 /** 
@@ -123,8 +122,8 @@ class Comments
                             WHERE `id` = ".(int)$data['id_shift'] 
                            );
         
-        $row = db::prepareResult($res);
-        $data['id_top'] = !empty($row[0]['id_top']) ? $row[0]['id_top'] : $data['id_shift'];
+        $row = db::fetchRow($res);
+        $data['id_top'] = !empty($row['id_top']) ? $row['id_top'] : $data['id_shift'];
         $id  = Model::insertInto(self::$_table, $data);
         return empty($id);
     }
@@ -140,6 +139,7 @@ class Comments
     
 /** 
 * Удаляем комментарий
+* @access public
 * @param string $owner
 * @access public
 */  
@@ -153,10 +153,33 @@ class Comments
         else
             $condition = "\n`owner` = '". db::escape($owner) ."' AND ";
      
-        $condition .= "\n`id_parent` IN (". implode(',', db::intval($ids)) .")";
+        $condition .= "\n`id_parent` IN (". db::implodeInt($ids) .")";
         
         return Model::deleteFrom(self::$_table, $condition);
     }
+    
+/** 
+* Постраничка
+* @access protected
+* @param string $owner
+* @access public
+*/  
+    protected static function _getPagination($where, $cond, $pag_num)
+    {
+
+        $config = \Config::get(self::$_mod);
+        
+        Paginator::setLimitParam($pag_num, $config['num_pag']);
+        $res = Paginator::countQuery("SELECT *
+                                       FROM `". IRB_CONFIG_DBPREFIX . self::$_table ."`
+                                        WHERE ". $where . $cond ."
+                                          ORDER BY `id` ASC"
+                                    );    
+            
+        self::$_page_menu = Paginator::createMenu($config['key_pag']);
+        return db::fetchArray($res);
+    }    
+    
     
 }
 

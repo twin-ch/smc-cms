@@ -2,9 +2,9 @@
 
 namespace debug;
 
-use db\mysqli as db;
+use db\db as db;
 
-class DBdebug
+class Debug_Mysqli
 {
     public static function prepareError($file, $line, $sql = '', $error = '')
     { 
@@ -37,7 +37,7 @@ class DBdebug
         if(empty($error))
         {
             $start = microtime(true);
-            mysqli_query(db::$link, $sql);
+            mysqli_query(db::getLink, $sql);
             $end   = microtime(true);
             $output .= '<div style="color:black; background:#F5EDB1;padding:5px">
                            <strong>Query time: </strong>'. sprintf("%01.4f", $end - $start) .' s
@@ -45,12 +45,11 @@ class DBdebug
                            <strong>Explain:</strong>
                        </div>';
             
-            $res = mysqli_query(db::$link, "EXPLAIN ". $sql);
+            $res = mysqli_query(db::getLink, "EXPLAIN ". $sql);
             
             if(is_object($res))
             {
-                $explain = db::prepareResult($res);
-                $explain = array_shift($explain);
+                $explain = mysqli_fetch_assoc($res);
                 $output .= '<table class="irb_explain" width="100%" border="0" cellspacing="0" cellpadding="0">
                             <tr style="color:##B2B2B2">
                                 <th>id</th>

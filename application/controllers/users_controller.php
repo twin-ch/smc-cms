@@ -34,8 +34,8 @@ class Users_Controller
     public static function actionUser($get)
     {
         $id      = $get['b'];
-        $pag_num = $get['c'];
-        $id_ans  = $get['d'];
+        $pag_num = $get['d'];
+        $id_ans  = $get['e'];
         $info    = '';
         
         if(!empty($_POST))
@@ -56,8 +56,8 @@ class Users_Controller
 */
     public static function __callStatic($name, $get)
     {
-        $pag_num = $get[0]['a'];
-        $id_ans  = $get[0]['b'];
+        $pag_num = $get[0]['d'];
+        $id_ans  = $get[0]['e'];
         $info    = '';
         
         if(!empty($_POST))
